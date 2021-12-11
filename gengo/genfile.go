@@ -56,7 +56,7 @@ func writeImports(w io.Writer, pathToName map[string]string) {
 	for p := range pathToName {
 		importPaths = append(importPaths, p)
 	}
-	sort.Sort(sort.StringSlice(importPaths))
+	sort.Strings(importPaths)
 
 	if len(importPaths) > 0 {
 		_, _ = fmt.Fprintf(w, `

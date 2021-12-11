@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	gengotypes "github.com/snail-tools/gen-go/types"
+	"github.com/stretchr/testify/require"
 )
 
 type modelGen struct {
@@ -64,9 +65,8 @@ func (g *modelGen) generateIndex() {
 } [[ end ]]
 
 [[ if .hasIndexes ]] func([[ .typeName ]]) Indexes() [[ "github.com/snail-tools/sqlx.Indexes" | pkg ]] {
-	return [[ .indexes ]]
+    return [[ .indexes ]]
 } [[ end ]]
-
 `, Args{
 		"hasPrimary": true,
 		"hasIndexes": true,
@@ -82,6 +82,7 @@ func TestGenfile(t *testing.T) {
 	pkg := u.Package(pwd)
 	file := NewGenFile(pkg)
 	file.Generator(&modelGen{})
-	data, _ := file.Bytes()
+	data, err := file.Source()
+	require.NoError(t, err)
 	fmt.Println(string(data))
 }

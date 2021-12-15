@@ -2,6 +2,7 @@ package gengo
 
 import (
 	"fmt"
+	"path/filepath"
 	"testing"
 
 	gengotypes "github.com/snail-tools/gen-go/types"
@@ -31,11 +32,11 @@ func (g *modelGen) generateTable() {
 func ([[ .typeName ]]) TableName() string {
 	return "t_"+[[ "github.com/snail-tools/strcase.SnakeCase" | pkg ]]("[[ .typeName ]]")
 }`, Args{
-		"typeName": "User",
+		"typeName": "Account",
 	})
 }
 func (g *modelGen) generateFieldKeys() {
-	typeName := "User"
+	typeName := "Account"
 	list := []string{"UserID", "Name", "Email", "Password"}
 	for _, n := range list {
 		g.Do(`
@@ -64,13 +65,13 @@ func (g *modelGen) generateIndex() {
 	return [[ .primary ]]
 } [[ end ]]
 
-[[ if .hasIndexes ]] func([[ .typeName ]]) Indexes() [[ "github.com/snail-tools/sqlx.Indexes" | pkg ]] {
+[[ if .hasIndexes ]] func([[ .typeName ]]) Indexes() map[string][]string {
     return [[ .indexes ]]
 } [[ end ]]
 `, Args{
 		"hasPrimary": true,
 		"hasIndexes": true,
-		"typeName":   "User",
+		"typeName":   "Account",
 		"primary":    g.Dumper().ValueOf([]string{"ID"}),
 		"indexes":    g.Dumper().ValueOf(indexs),
 	})
@@ -82,7 +83,8 @@ func TestGenfile(t *testing.T) {
 	pkg := u.Package(pwd)
 	file := NewGenFile(pkg)
 	file.Generator(&modelGen{})
-	data, err := file.Source()
+	filename := filepath.Dir(pkg.GoFiles()[0]) + "/account__generated.go"
+	fmt.Println(filename)
+	err := file.WriteFile(filename)
 	require.NoError(t, err)
-	fmt.Println(string(data))
 }

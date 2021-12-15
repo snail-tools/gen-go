@@ -15,6 +15,7 @@ type Package interface {
 	Module() *packages.Module
 	SourceDir() string
 	Files() []*ast.File
+	GoFiles() []string
 
 	Doc(pos token.Pos) (map[string][]string, []string)
 	Comment(pos token.Pos) []string
@@ -261,6 +262,10 @@ func (pi *pkgInfo) Doc(pos token.Pos) (map[string][]string, []string) {
 
 func (pi *pkgInfo) Comment(pos token.Pos) []string {
 	return commentLinesFrom(pi.priorCommentLines(pos, 0))
+}
+
+func (pi *pkgInfo) GoFiles() []string {
+	return pi.pkg.GoFiles
 }
 
 func (pi *pkgInfo) priorCommentLines(pos token.Pos, deltaLines int) *ast.CommentGroup {

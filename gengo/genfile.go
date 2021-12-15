@@ -7,6 +7,7 @@ import (
 	"go/scanner"
 	"go/token"
 	"io"
+	"io/ioutil"
 	"sort"
 	"strings"
 
@@ -83,6 +84,22 @@ func (f *GenFile) Source() ([]byte, error) {
 	return imports.Process("", data, &imports.Options{
 		FormatOnly: true,
 	})
+}
+
+func (f *GenFile) Write(w io.Writer) (int, error) {
+	data, err := f.Source()
+	if err != nil {
+		return 0, err
+	}
+	return w.Write(data)
+}
+
+func (f *GenFile) WriteFile(filname string) error {
+	data, err := f.Source()
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(filname, data, 0666)
 }
 
 func writeImports(w io.Writer, pathToName map[string]string) {
